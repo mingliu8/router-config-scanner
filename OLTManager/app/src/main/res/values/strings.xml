@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">OLT管理器</string>
+    <string name="connect_olt">连接OLT</string>
+    <string name="ip_address">IP地址</string>
+    <string name="port">端口</string>
+    <string name="username">用户名</string>
+    <string name="password">密码</string>
+    <string name="connect">连接</string>
+    <string name="disconnect">断开连接</string>
+    <string name="refresh">刷新</string>
+    <string name="register">注册</string>
+    <string name="unregistered_onts">未注册光猫</string>
+    <string name="registered_onts">已注册光猫</string>
+    <string name="sn">序列号</string>
+    <string name="status">状态</string>
+    <string name="pon_port">PON端口</string>
+    <string name="message_connect_success">连接成功</string>
+    <string name="message_connect_failed">连接失败</string>
+    <string name="message_register_success">注册成功</string>
+    <string name="message_register_failed">注册失败</string>
+    <string name="message_refresh_success">刷新成功</string>
+    <string name="message_refresh_failed">刷新失败</string>
+</resources>
