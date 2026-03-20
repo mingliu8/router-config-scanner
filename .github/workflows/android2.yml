@@ -1,0 +1,54 @@
+name: Android CI Build APK
+
+# 触发条件：main分支推送、PR合并、手动触发
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:  # 允许手动触发
+
+# 环境配置：解决Node.js警告 + Gradle优化
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码（定位到android文件夹）
+      - name: Checkout code
+        uses: actions/checkout@v4.1.7
+        with:
+          path: .  # 如果android是根目录，直接用.；如果在子目录，对应修改路径
+
+      # 2. 配置JDK 17（Android官方推荐，兼容Gradle 9.0.0）
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4.5.0
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle  # 开启Gradle缓存，第二次构建提速80%+
+
+      # 3. 配置Gradle国内镜像（解决下载慢，匹配你本地的9.0.0版本）
+      - name: Configure Gradle mirror
+        run: |
+          sed -i 's|https\://services.gradle.org/distributions/gradle-.*-bin.zip|https\://mirrors.cloud.tencent.com/gradle/gradle-9.0.0-bin.zip|g' android/gradle/wrapper/gradle-wrapper.properties
+
+      # 4. 赋予gradlew可执行权限
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      # 5. 执行构建（打包Debug APK，路径对应android文件夹）
+      - name: Build with Gradle
+        run: cd android && ./gradlew assembleDebug --parallel --build-cache
+
+      # 6. 上传APK产物（可直接下载）
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-app-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30  # 产物保留30天
